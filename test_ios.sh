@@ -78,12 +78,9 @@ if [ ${#tests[@]} -eq 0 ]; then
     dirs=(test/unit)
     [ -n "${LIVEKIT_TEST_URL:-}" ] && dirs+=(test/integration)
     [ -n "${RUN_E2E:-}" ] && dirs+=(test/e2e)
-    # In order, so that network tests don't start while the app is still launching.
-    for dir in "${dirs[@]}"; do
-        for path in $(find "$dir" -maxdepth 1 -name 'test_*.gd' | sort); do
-            t="res://$path"
-            [[ " ${EXCLUDED_TESTS[*]} " == *" $t "* ]] || tests+=("$t")
-        done
+    for path in $(find "${dirs[@]}" -maxdepth 1 -name 'test_*.gd' | sort); do
+        t="res://$path"
+        [[ " ${EXCLUDED_TESTS[*]} " == *" $t "* ]] || tests+=("$t")
     done
 fi
 
@@ -147,13 +144,6 @@ wait_for_idle_cpu() {
             return 0
         fi
         echo "Waiting for the host's CPU to settle (${idle}% idle)..."
-        if [ $((SECONDS / 60)) -ne "${PROBE_LAST_MIN:--1}" ]; then
-            PROBE_LAST_MIN=$((SECONDS / 60))
-            echo "PROBE top processes at ${SECONDS}s:"
-            ps -A -o %cpu=,pid=,comm= >/tmp/probe_ps.txt || true
-            sort -rn /tmp/probe_ps.txt >/tmp/probe_sorted.txt || true
-            sed -n '1,12s/^/PROBE   /p' /tmp/probe_sorted.txt
-        fi
         sleep 5
     done
 }
