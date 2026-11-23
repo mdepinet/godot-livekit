@@ -74,9 +74,12 @@ if [ ${#tests[@]} -eq 0 ]; then
     dirs=(test/unit)
     [ -n "${LIVEKIT_TEST_URL:-}" ] && dirs+=(test/integration)
     [ -n "${RUN_E2E:-}" ] && dirs+=(test/e2e)
-    for path in $(find "${dirs[@]}" -maxdepth 1 -name 'test_*.gd' | sort); do
-        t="res://$path"
-        [[ " ${EXCLUDED_TESTS[*]} " == *" $t "* ]] || tests+=("$t")
+    # In order, so that network tests don't start while the app is still launching.
+    for dir in "${dirs[@]}"; do
+        for path in $(find "$dir" -maxdepth 1 -name 'test_*.gd' | sort); do
+            t="res://$path"
+            [[ " ${EXCLUDED_TESTS[*]} " == *" $t "* ]] || tests+=("$t")
+        done
     done
 fi
 
@@ -167,8 +170,6 @@ print(r[-1]["identifier"], t[-1]) if t else print()') || true
         CREATED_DEVICE=true
     fi
     xcrun simctl boot "$DEVICE" >/dev/null 2>&1 || true
-    echo "PROBE log config: $(xcrun simctl spawn "$DEVICE" log config --mode "level:off" 2>&1; echo "rc=$?")"
-    echo "PROBE log status: $(xcrun simctl spawn "$DEVICE" log config --status 2>&1 | head -3)"
 fi
 
 if [ -f export_presets.cfg ]; then
