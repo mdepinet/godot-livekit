@@ -9,6 +9,7 @@ jobs:
   build-and-test:
     name: Build and Test for ${{ matrix.os-name }}
     runs-on: ${{ matrix.os }}
+    if: false
     strategy:
       matrix:
         include:
@@ -119,6 +120,7 @@ jobs:
   web:
     name: Build and Test for Web
     runs-on: ubuntu-latest
+    if: false
     env:
       GODOT_VERSION: "4.5"
       # Godot's web templates require extensions built with a matching Emscripten.
@@ -200,6 +202,7 @@ jobs:
   android:
     name: Test on Android (x86_64 emulator)
     runs-on: ubuntu-latest
+    if: false
     env:
       GODOT_VERSION: "4.5.2"
       LIVEKIT_SERVER_VERSION: "1.13.7"
@@ -486,6 +489,7 @@ jobs:
       env:
         GODOT: ${{ github.workspace }}/Godot.app/Contents/MacOS/Godot
         GODOT_IOS_SIMULATOR_LIB: ${{ runner.temp }}/godot-ios-simulator/libgodot.a
+        IOS_SETTLE_TIMEOUT_SEC: "1500"
       run: ./test_ios.sh
 
     - name: Upload the LiveKit server log

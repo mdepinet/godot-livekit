@@ -140,6 +140,11 @@ wait_for_idle_cpu() {
             return 0
         fi
         echo "Waiting for the host's CPU to settle (${idle}% idle)..."
+        if [ $((SECONDS / 60)) -ne "${PROBE_LAST_MIN:--1}" ]; then
+            PROBE_LAST_MIN=$((SECONDS / 60))
+            echo "PROBE top processes at ${SECONDS}s:"
+            ps -A -o %cpu=,pid=,comm= | sort -rn | head -12 | sed 's/^/PROBE   /'
+        fi
         sleep 5
     done
 }
