@@ -143,7 +143,9 @@ wait_for_idle_cpu() {
         if [ $((SECONDS / 60)) -ne "${PROBE_LAST_MIN:--1}" ]; then
             PROBE_LAST_MIN=$((SECONDS / 60))
             echo "PROBE top processes at ${SECONDS}s:"
-            ps -A -o %cpu=,pid=,comm= | sort -rn | head -12 | sed 's/^/PROBE   /'
+            ps -A -o %cpu=,pid=,comm= >/tmp/probe_ps.txt || true
+            sort -rn /tmp/probe_ps.txt >/tmp/probe_sorted.txt || true
+            sed -n '1,12s/^/PROBE   /p' /tmp/probe_sorted.txt
         fi
         sleep 5
     done
