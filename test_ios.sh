@@ -167,6 +167,8 @@ print(r[-1]["identifier"], t[-1]) if t else print()') || true
         CREATED_DEVICE=true
     fi
     xcrun simctl boot "$DEVICE" >/dev/null 2>&1 || true
+    echo "PROBE log config: $(xcrun simctl spawn "$DEVICE" log config --mode "level:off" 2>&1; echo "rc=$?")"
+    echo "PROBE log status: $(xcrun simctl spawn "$DEVICE" log config --status 2>&1 | head -3)"
 fi
 
 if [ -f export_presets.cfg ]; then
